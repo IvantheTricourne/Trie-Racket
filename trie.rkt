@@ -61,6 +61,26 @@
 
 ;; get all words contained within a trie
 ;;; todo: Words that stop early (e.g. "cat" and "nice") are repeated
+
+;; trie.rkt﻿> (define test (make-empty-node))
+;; trie.rkt﻿> (insert "cat" test)
+;; #<node>
+;; trie.rkt﻿> (get-words test)
+;; '("cat")
+;; trie.rkt﻿> (insert "cats" test)
+;; #<node>
+;; trie.rkt﻿> (get-words test)
+;; '("cats" "cat")
+;; trie.rkt﻿> (node-dict (get-prefix "cat" test))
+;; '#hash((#\s . #<node>))
+;; trie.rkt﻿> (insert "cata" test)
+;; #<node>
+;; trie.rkt﻿> (node-dict (get-prefix "cat" test))
+;; '#hash((#\s . #<node>) (#\a . #<node>))
+;; trie.rkt﻿> (get-words test)
+;; '("cata" "cat" "cats" "cat")
+
+
 (define (get-words start-node)
   (define (add-word word words curr)
     (if (node-end? curr)
@@ -71,9 +91,8 @@
     (cond
       ;; empty-dict
       [(zero? (hash-count dict))
-       ;;(define new-words (add-word word words curr))
-       ;;new-words
-       words]
+       (define new-words (add-word word words curr))
+       new-words]
       [else
        (define new-words (add-word word words curr))
        (define keys (hash-keys dict))
