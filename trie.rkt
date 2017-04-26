@@ -60,27 +60,6 @@
        (and next-node (loop (add1 i) next-node))])))
 
 ;; get all words contained within a trie
-;;; todo: Words that stop early (e.g. "cat" and "nice") are repeated
-
-;; trie.rkt﻿> (define test (make-empty-node))
-;; trie.rkt﻿> (insert "cat" test)
-;; #<node>
-;; trie.rkt﻿> (get-words test)
-;; '("cat")
-;; trie.rkt﻿> (insert "cats" test)
-;; #<node>
-;; trie.rkt﻿> (get-words test)
-;; '("cats" "cat")
-;; trie.rkt﻿> (node-dict (get-prefix "cat" test))
-;; '#hash((#\s . #<node>))
-;; trie.rkt﻿> (insert "cata" test)
-;; #<node>
-;; trie.rkt﻿> (node-dict (get-prefix "cat" test))
-;; '#hash((#\s . #<node>) (#\a . #<node>))
-;; trie.rkt﻿> (get-words test)
-;; '("cata" "cat" "cats" "cat")
-
-
 (define (get-words start-node)
   (define (add-word word words curr)
     (if (node-end? curr)
@@ -91,16 +70,13 @@
     (cond
       ;; empty-dict
       [(zero? (hash-count dict))
-       (define new-words (add-word word words curr))
-       new-words]
+       (add-word word words curr)]
       [else
-       (define new-words (add-word word words curr))
        (define keys (hash-keys dict))
        (define (loopify c)
-         (loop (append word (list c))
-               new-words
-               (hash-ref dict c)))
-       (append-map loopify keys)])))
+         (loop (append word (list c)) words (hash-ref dict c)))
+       (define new-words (append-map loopify keys))
+       (add-word word new-words curr)])))
 
 
 ;;; main
@@ -130,10 +106,12 @@
            '("niceuuu" "niceruuu" "niceuuuruuu"))
    "missing a word in nice branch")
   ;; test for get-words
+  (define all-words (get-words root-node))
   ;; (check-true
   ;;  (andmap (λ (word)
-  ;;            (memv word '("cat" "cata" "cats" "niceuuu" "niceruuu" "niceuuuruuu")))
-  ;;          (get-words root-node)))
+  ;;            (memv word all-words))
+  ;;          '("cat" "cata" "cats" "nice"
+  ;;            "niceuuu" "niceruuu" "niceuuuruuu")))
   )
 
 
